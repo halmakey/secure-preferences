@@ -80,8 +80,9 @@ public class SecurePreferences implements SharedPreferences {
     private static HashMap<OnSharedPreferenceChangeListener, OnSharedPreferenceChangeListener>
             sOnSharedPreferenceChangeListeners;
 	private static final String TAG = SecurePreferences.class.getName();
+    private static int sIterations = 2000;
 
-	/**
+    /**
 	 * Constructor.
 	 * 
 	 * @param context
@@ -113,6 +114,10 @@ public class SecurePreferences implements SharedPreferences {
                 new HashMap<OnSharedPreferenceChangeListener, OnSharedPreferenceChangeListener>(10);
 	}
 
+    public static void setIterations(int iterations) {
+        sIterations = iterations;
+    }
+
 	private static String encode(byte[] input) {
 		return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP);
 	}
@@ -133,13 +138,13 @@ public class SecurePreferences implements SharedPreferences {
 			// TODO: what if there's an OS upgrade and now supports the primary
 			// PBE
 			key = SecurePreferences.generatePBEKey(password, salt,
-					PRIMARY_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
+					PRIMARY_PBE_KEY_ALG, sIterations, KEY_SIZE);
 		} catch (NoSuchAlgorithmException e) {
 			// older devices may not support the have the implementation try
 			// with a weaker
 			// algorthm
 			key = SecurePreferences.generatePBEKey(password, salt,
-					BACKUP_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
+					BACKUP_PBE_KEY_ALG, sIterations, KEY_SIZE);
 		}
 		return SecurePreferences.encode(key.getEncoded());
 	}
